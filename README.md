@@ -55,7 +55,7 @@ Add This In Your "widget" After `<content src="index.html" />`:
 
 # Add Cordova KYC Plugin
 ```
-$ cordova plugin add kaseem.demo
+$ cordova plugin add cordova_demo
 ```
 # Add Dependencies
 
