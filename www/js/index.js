@@ -53,7 +53,7 @@ function onDeviceReady() {
     }
 
     console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
-    accura = cordova.plugins.KaseemTrialPlugin;
+    accura = cordova.plugins.CordovaDemoPlugin;
 
     getMetadata();
     setupAccuraConfig();
@@ -254,7 +254,7 @@ function setupAccuraConfig() {
         feedBackGlareFaceMessage: "Glare Detected",
         feedBackLowLightMessage: "Low light detected",
         showlogo: 1,
-        livenessURL: "https://accurascan.com:8443",
+        livenessURL: "Your Liveness URL",
         setLowLightTolerence: -1,
         setBlurPercentage: 80,
         setGlarePercentage1: -1,
@@ -316,7 +316,7 @@ function startLiveness() {
             }
 
     }, function(error) {
-        console.log(error);
+        alert(error);
     });
 
 }
@@ -431,7 +431,7 @@ function openGallery2() {
             $("#fm-score1").text(Number(result.fm_score).toFixed(2) + "%");
         }
     }, function(error) {
-        console.log("openGallery2 FAIL", error);
+        alert(error);
     });
 
 }
