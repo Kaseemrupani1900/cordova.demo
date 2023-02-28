@@ -135,7 +135,7 @@ Replace Your Licenses In These Locations.
 
 ### 2: License Path For iOS ###
 ```
-Place Both The License In Your "Resources" Folder
+Place Both The License In Your "Resources" Folder, And Add The Licenses To The Target.
 ```
 
 # javascript(index.js)
