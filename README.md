@@ -640,6 +640,11 @@ Success: JSON Response {
 
 fmImage1 - fmImage2: URI?,
 
-fm_score: String, }
+fm_score: String, 
+
+}
 
 Error: String
+
+# 10. To Remove Cordova Plugin
+` $ cordova plugin rm cordova-demo `
