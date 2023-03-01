@@ -49,10 +49,6 @@ Add This In Your "widget" After `<content src="index.html" />`:
     <preference name="StatusBarOverlaysWebView" value="false" />
 ```
 
-# Run Cordova Build Command
-
-`$ cordova build`
-
 # Add Cordova KYC Plugin
 ```
 $ cordova plugin add cordova_demo
@@ -66,10 +62,6 @@ $ cordova plugin add cordova-plugin-whitelist
 
 $ cordova plugin add cordova-plugin-add-swift-support
 ```
-
-# Run Cordova Build Command
-
-`$ cordova build`
 
 # 1.Setup Android
 
@@ -121,6 +113,10 @@ android {
 	
 }
 ```
+
+# Run Cordova Build Command
+
+`$ cordova build`
 
 # 2.Setup AccuraScan Licenses Into Your Projects
 
