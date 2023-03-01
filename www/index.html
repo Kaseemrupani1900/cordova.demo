@@ -14,112 +14,23 @@
     <body style="background:white;overflow:hidden;touch-action:none">
 
         <div class="p-3 bg-danger d-flex justify-content-center justify-content-between">
-            <h4 class="text-white font-weight-bold">Accura 0.0.3</h4>
-            <button id="orientation-btn" class="btn btn-secondary btn-round btn-light btn-sm" style="width:110px;right:10px;margin-top:0;">Landscape</button>
+            <img src="./img/left.png" class="img-fluid" id="back-btn" onclick="backAction()" alt="back" style="display:none;">
+            <h6 class="text-white mt-2">Accura</h6>
+            <button id="orientation-btn" class="btn btn-sm text-white" style="width:80px;right:10px;margin-top:0;">Landscape</button>
         </div>
+
+            <center><img id="ocr-img" src="./img/OCR.jpg" class="p-4 img-fluid" width="500px" alt="OCR" onclick="getMetadata()"></center>
+
+            <center><img id="fm-img" src="./img/Facematch.jpg" class="p-4 img-fluid" width="500px" alt="OCR" onclick="showFM()"></center>
+
 
         <div id="main-div" class="pt-2" style="display:none;overflow: auto;height: 90%">
 
-            <div id="ocr-div" class="border p-2 m-3" style="display:none;">
-
-                <div class="mt-2 d-flex justify-content-center align-items-center">
-                    <button class="btn btn-danger btn-round" style="width:220px;" data-bs-toggle="modal" data-bs-target="#countryModal">Start OCR</button>
-                </div>
-
-                <div class="form-group p-2 border m-3 ocr">
-                    <h4>OCR With Country</h4>
-                    <div class="form-group">
-                        <label for="countries-1">Country</label>
-                        <select onchange="countrySelected=this.value" id="countries-1" class="form-select" aria-label="Default select example">
-
-                        </select>
-                    </div>
-                    <div class="mt-2 d-flex align-items-center justify-content-center">
-                        <button class="btn btn-danger btn-block" style="width: 220px" onclick="startOcrWithCountry()">Start OCR With Country</button>
-                    </div>
-                </div>
+            <table id="tables" class="table">
 
 
-            </div>
+            </table>
 
-            <div id="mrz-div" class="border p-2 m-3" style="display:none;">
-                <h4 class="text-weight-bold">MRZ</h4>
-                <div class="form-group">
-                    <select class="form-select" onchange="mrzSelected=this.value" aria-label="Default select example">
-                        <option value="passport_mrz">Passport</option>
-                        <option value="visa_mrz">Visa</option>
-                        <option value="id_mrz">ID Card</option>
-                        <option selected value="other_mrz">All</option>
-                    </select>
-                </div>
-                <div class="mt-2 d-flex justify-content-center align-items-center">
-                    <button class="btn btn-danger btn-round" style="width:220px;" onclick="startMRZ()">Start MRZ</button>
-                </div>
-
-            </div>
-            
-            <div id="barcode-div" class="form-group p-2 m-3 border" style="display:none">
-                <h4>Barcode</h4>
-                <div class="form-group col-md-3">
-                    <label for="barcode-types">Type</label>
-                    <select class="form-select" onchange="barcodeSelected = this.value" id="barcode-types" aria-label="Default select example">
-
-                    </select>
-                </div>
-                <div class="mt-2 d-flex justify-content-center align-items-center">
-                    <button class="btn btn-danger btn-round" style="width:220px;" onclick="startBarcode()">Start Barcode</button>
-                </div>
-            </div>
-            
-            <div id="bank-div" class="form-group p-2 m-3 border" style="display: none">
-                <h4>Bank card</h4>
-                <div class="mt-2 d-flex justify-content-center align-items-center">
-                    <button class="btn btn-danger btn-round" style="width:220px;" onclick="startBankcard()">Bank Card</button>
-                </div>
-            </div>
-
-            <div id="fm-div" class="p-2 border m-3">
-                <h4>Facematch</h4>
-                <div class="mt-2 d-flex align-items-center justify-content-center">
-                    <button class="btn btn-danger btn-block" style="width: 220px" data-bs-toggle="modal" data-bs-target="#facematchModel">Face Match</button>
-                </div>
-            </div>
-            
-        </div>
-
-
-        <!-- Country Modal -->
-        <div class="modal" id="countryModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Country</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!--Card Modal-->
-        <div class="modal" id="cardModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title"></h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Result Modal -->
@@ -138,37 +49,37 @@
                 </div>
             </div>
         </div>
-        
-        <!--  Face Match Modal -->
-        <div class="modal" id="facematchModel" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Face Match</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div id='fm-img-div' class='d-flex justify-content-center justify-content-between'>
-                            <img id='face1' class='border img-fluid' src='./img/download.jpeg' style='max-height: 120px;'>
-                            <img id='face2' class='border img-fluid' src='./img/download.jpeg' style='max-height: 120px;'>
-                        </div>
-                        <div id='fm-score-div' class='mt-2 d-flex justify-content-center'>
-                            <h5 id='fm-score1' style="display:none;">0.00%</h5>
-                        </div>
-                        <div class="mt-2 d-flex align-items-center justify-content-center justify-content-between">
-                            <button class="btn btn-danger btn-block" style="width:150px" onclick="startFacematch1()">Camera</button>
-                            <button class="btn btn-danger btn-block" style="width:150px" onclick="startFacematch2()">Camera</button>
-                        </div>
-                        <div class="mt-2 d-flex align-items-center justify-content-center justify-content-between">
-                            <button class="btn btn-danger btn-block" style="width:150px" onclick="openGallery1()">Gallery</button>
-                            <button class="btn btn-danger btn-block" style="width:150px"  onclick="openGallery2()">Gallery</button>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
+
+
+        <!--FaceMatch Div-->
+        <div id="fm-div" class="pt-2 m-2" style="display:none;overflow: auto;height: 90%">
+
+            <div class='fm-img-div p-2'>
+                <center><img id='face1' src="./img/placeholder.png" class="p-4 img-fluid" style="width:310px;height:200px" alt="OCR" onclick="getMetadata()"></center>
             </div>
+
+            <div>
+                <center><button class="btn btn-danger btn-block" style="width:310px" onclick="startFacematch1()">Camera</button></center>
+                <center><button class="btn btn-danger btn-block mt-2" style="width:310px" onclick="openGallery1()">Gallery</button></center>
+
+            </div>
+
+            <div class='fm-img-div' class="d-flex justify-content-center">
+                <center><img id='face2' src="./img/placeholder.png" class="p-4 img-fluid mt-2" style="width:310px;height:200px" alt="OCR" onclick="getMetadata()"></center>
+            </div>
+
+            <div>
+                <center><button class="btn btn-danger btn-block" style="width:310px" onclick="startFacematch2()">Camera</button></center>
+                <center><button class="btn btn-danger btn-block mt-2" style="width:310px"  onclick="openGallery2()">Gallery</button></center>
+            </div>
+
+
+
+            <div id='fm-score-div' class='mt-2 d-flex justify-content-center'>
+                <h5 id='fm-score1' style="display:none;">0.00%</h5>
+            </div>
+
+
         </div>
 
         <script src="cordova.js"></script>

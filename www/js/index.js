@@ -53,11 +53,27 @@ function onDeviceReady() {
     }
 
     console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
-    accura = cordova.plugins.CordovaDemoPlugin;
+    accura = cordova.plugins.CordovaPluginKYC;
 
-    getMetadata();
+    accura.getMetadata(function(results) {
+
+        if (results.isValid) {
+            alert("License Loaded " + results.sdkVersion);
+        } else {
+            alert("License Not Loaded");
+        }
+
+    }, function(error) {
+        console.log("error FAIL", error);
+    });
+
+
+//    getMetadata();
     setupAccuraConfig();
 }
+
+var mrzTypes = ["passport_mrz", "id_mrz", "visa_mrz", "other_mrz"];
+var mrzNames = ["Passport MRZ", "ID MRZ", "Visa MRZ", "Other MRZ"];
 
 var mrzSelected = 'other_mrz';
 var mrzCountryList = 'all';
@@ -70,40 +86,24 @@ var cards;
 
 var barcodeSelected = '';
 
+
 function getMetadata() {
-    console.log("heloooooooooo");
-    $('#countries-1, #countryModal .modal-body').empty();
+    $("#ocr-img, #fm-img").fadeOut();
+    $("#back-btn").fadeIn();
     accura.getMetadata(function(results) {
-        console.log("getMetadata PASS", results);
         if(results.isValid) {
-            alert("License Loaded " + results.sdkVersion);
+//            alert("License Loaded " + results.sdkVersion);
             $("#main-div").fadeIn();
-            if(results.isOCR) {
-                $("#ocr-div").fadeIn();
-                if(results.countries.length > 0) {
-                    countries = results.countries;
-                    results.countries.forEach(function (country, i) {
-                        var uid = i + "_" + country.id;
-                        if(i === 0) {
-                            countrySelected = countrySelectedForCard = uid;
-                            getCards(countrySelectedForCard);
-                        }
-                        $('#countries-1').append(
-                            '<option value="' + uid + '">' + country.name + '</option>'
-                        )
-                        $("#countryModal .modal-body").append(
-                            "<h5 onclick='getCardModal(this.id)' class='country-card' id='" + i + "'>" + country.name + "</h5>"
-                        )
-                    })
+
+            if(results.isMRZ) {
+                for (let i = 0; i < mrzNames.length; i++) {
+                    $("#tables").append(
+                        "<thead class='mrz-head' class='mrz-head'><th><button class='btn btn-round' style='width:100%;height:50px;background-color: #818589;color: white;font-size: 20px;' onclick='startMRZ(this.value)' value='" + mrzTypes[i] + "'>" + mrzNames[i] + "</button></th></tr></thead>"
+                    )
                 }
             }
-            
-            if(results.isMRZ) {
-                $("#mrz-div").fadeIn();
-            }
-            
+
             if (results.isBarcode) {
-                $("#barcode-div").fadeIn();
                 results.barcodes.forEach(function (barcode, i) {
                     if (i === 0) {
                         barcodeSelected = barcode.type;
@@ -112,12 +112,32 @@ function getMetadata() {
                         '<option value="' + barcode.type + '">' + barcode.name + '</option>'
                     )
                 })
+                $("#tables").append(
+                    "<thead class='barcode-head' class='barcode-head'><th><button class='btn btn-round' style='width:100%;height:50px;background-color: #818589;color: white;font-size: 20px;'>Barcode</button></th></tr></thead>"
+                )
             }
-            
+
             if (results.isBankcard) {
-                $("#bank-div").fadeIn();
+                $("#tables").append(
+                        "<thead class='bank-head' class='bank-head'><th><button class='btn btn-round' style='width:100%;height:50px;background-color: #818589;color: white;font-size: 20px;' onclick='startBankcard()'>Bank Card</button></th></tr></thead>"
+                )
             }
-            
+
+            if(results.isOCR) {
+                if(results.countries.length > 0) {
+                    countries = results.countries;
+                    results.countries.forEach(function (country, i) {
+                        var uid = i + "_" + country.id;
+                        if(i === 0) {
+                            countrySelected = countrySelectedForCard = uid;
+                        }
+                        $("#tables").append(
+                            "<thead class='ocr-head' class='ocr-head'><th><button class='btn btn-danger btn-round' style='width:100%;height:50px;color: white;font-size: 20px;' onclick='getCardModal(this.id)' id='" + i + "'>" + country.name + "</button></th></tr></thead>"
+                        )
+                    })
+                }
+            }
+
         } else {
             alert("License Not Loaded");
         }
@@ -126,57 +146,71 @@ function getMetadata() {
     });
 }
 
-function getCards(id) {
-    console.log("getImage(id)", id);
-    id = id.split("_");
-    cards = countries[id[0]].cards;
-    $('#cards').empty();
-    cards.forEach(function (card, i) {
-        var uid = i + '_' + card.id + '_' + card.type;
-        if (i === 0) {
-            cardSelected = uid;
+function showFM() {
+
+    $("#ocr-img, #fm-img").fadeOut();
+    $("#back-btn").fadeIn();
+
+    accura.getMetadata(function(results) {
+
+        if (results.isValid) {
+
+            $("#fm-div").fadeIn()
+
         }
-        $('#cards').append(
-            '<option value="' + uid + '">' + card.name + '</option>'
-        )
-    })
+
+    }, function(error) {
+        console.log("error FAIL", error);
+    });
+
 }
 
-function startOcrWithCountry() {
-    getCardModal(countrySelected.split('_')[0]);
-}
 
 var countryCard;
 var countrySelectedId;
 
 function getCardModal(id) {
-    console.log("getCardModal(id)", id);
     countryCard = countries[id].cards;
     countrySelectedId = countries[id].id;
-    $("#cardModal .modal-title").text(countries[id].name + ":");
-    $("#cardModal .modal-body").empty();
+
+    $(".mrz-head, .barcode-head, .bank-head, .ocr-head").fadeOut();
+
     countryCard.forEach(function(card, i) {
-        $("#cardModal .modal-body").append(
-            "<h5 onClick='openForCard(this.id)' class='country-card' id='" + i + "'>" + card.name + "</h5>"
+        $("#tables").append(
+            "<thead class='ocr-card-head' class='ocr-card-head'><th><button class='btn btn-danger btn-round' style='width:100%;height:50px;color: white;font-size: 20px;' onClick='openForCard(this.id)' id='" + i + "'>" + card.name + "</button></th></tr></thead>"
         )
     });
-
-    $("#countryModal").modal('hide');
-    $("#cardModal").modal('show');
 }
 
 function openForCard(id) {
-    $("#countryModal").modal('hide');
-    $("#cardModal").modal('hide');
-
-    console.log("countryCard[id].type ", countryCard[id].type);
 
     accura.startOCR({enableLogs: false}, countrySelectedId, countryCard[id].id, countryCard[id].name, countryCard[id].type, function(result) {
-        console.log(result);
         generateResult(result);
     }, function(error) {
         console.log(error);
     });
+
+}
+
+function backAction() {
+
+    if ($(".mrz-head, .barcode-head, .bank-head, .ocr-head").is(':visible')) {
+        $("#tables").empty();
+        $("#main-div").fadeOut();
+        $("#ocr-img, #fm-img").fadeIn();
+        $("#back-btn").fadeOut();
+    }
+
+    if ($(".ocr-card-head").is(':visible')) {
+        $(".ocr-card-head").fadeOut();
+        $(".mrz-head, .barcode-head, .bank-head, .ocr-head").fadeIn();
+    }
+
+    if($("#fm-div").is(":visible")) {
+        $("#fm-div").fadeOut();
+        $("#ocr-img, #fm-img").fadeIn();
+        $("#back-btn").fadeOut();
+    }
 
 }
 
@@ -254,7 +288,7 @@ function setupAccuraConfig() {
         feedBackGlareFaceMessage: "Glare Detected",
         feedBackLowLightMessage: "Low light detected",
         showlogo: 1,
-        livenessURL: "Your Liveness URL",
+        livenessURL: "https://accurascan.com:8443",
         setLowLightTolerence: -1,
         setBlurPercentage: 80,
         setGlarePercentage1: -1,
@@ -285,10 +319,8 @@ function setupAccuraConfig() {
     });
 }
 
-function startMRZ() {
-    console.log("startMRZ", mrzSelected);
-    accura.startMRZ({enableLogs: false}, mrzSelected, mrzCountryList, function(result) {
-        console.log("startMRZ PASS", result);
+function startMRZ(value) {
+    accura.startMRZ({enableLogs: false}, value, mrzCountryList, function(result) {
         generateResult(result);
     }, function(error) {
         console.log("startMRZ FAIL", error)
@@ -296,12 +328,9 @@ function startMRZ() {
 }
 
 function startLiveness() {
-
-    console.log("startLiveness");
     var accuraConfig = {enableLogs:false, with_face: true, face_uri: facematchURI};
 
     accura.startLiveness(accuraConfig, function(result) {
-            console.log("startLiveness PASS", result.score);
             $("#score-div").fadeIn("fast", function() {
                 $("#score-div").css("display", "flex")
             });
@@ -316,19 +345,15 @@ function startLiveness() {
             }
 
     }, function(error) {
-        alert(error);
+        console.log(error);
     });
 
 }
 
 function startFaceMatch() {
-
-    console.log("startFaceMatch");
-
     var accuraConfig = {enableLogs:false, face_uri: facematchURI};
 
     accura.startFaceMatch(accuraConfig, function(result) {
-            console.log(result.score);
             $("#score-div").fadeIn("fast", function() {
                 $("#score-div").css("display", "flex")
             });
@@ -349,16 +374,16 @@ function startFaceMatch() {
 }
 
 function startFacematch1() {
-    console.log("startFacematch11");
     var accuraConfig = {
         face_uri1: facematchURI1,
         face_uri2: facematchURI2
     }
 
     accura.startFacematch1(accuraConfig, function(result) {
-        console.log("startFacematch1 PASS", result);
         if(result.hasOwnProperty("fmImage1")) {
             getImage("face1", result.fmImage1);
+            $("#face1").css("width", "150px");
+            $("#face1").css("height", "200px");
             facematchURI1 = result.fmImage1;
         }
         if(result.hasOwnProperty("fm_score")) {
@@ -370,18 +395,17 @@ function startFacematch1() {
     });
 }
 
-function startFacematch2() {
-    console.log("startFacematch22");
-    
+function startFacematch2() {    
     var accuraConfig = {
         face_uri1: facematchURI1,
         face_uri2: facematchURI2
     }
 
     accura.startFacematch2(accuraConfig, function(result) {
-        console.log("startFacematch2 PASS ", result);
         if(result.hasOwnProperty("fmImage2")) {
             getImage("face2", result.fmImage2);
+            $("#face2").css("width", "150px");
+            $("#face2").css("height", "200px");
             facematchURI2 = result.fmImage2;
         }
         if(result.hasOwnProperty("fm_score")) {
@@ -400,9 +424,10 @@ function openGallery1() {
     }
 
     accura.openGallery1(accuraConfig, function(result) {
-        console.log("openGallery1 PASS", result);
         if(result.hasOwnProperty("fmImage1")) {
             getImage("face1", result.fmImage1);
+            $("#face1").css("width", "150px");
+            $("#face1").css("height", "200px");
             facematchURI1 = result.fmImage1;
         }
         if(result.hasOwnProperty("fm_score")) {
@@ -421,9 +446,10 @@ function openGallery2() {
     }
 
     accura.openGallery2(accuraConfig, function(result) {
-        console.log("openGallery2 PASS", result);
         if(result.hasOwnProperty("fmImage2")) {
             getImage("face2", result.fmImage2);
+            $("#face2").css("width", "150px");
+            $("#face2").css("height", "200px");
             facematchURI2 = result.fmImage2;
         }
         if(result.hasOwnProperty("fm_score")) {
@@ -431,13 +457,12 @@ function openGallery2() {
             $("#fm-score1").text(Number(result.fm_score).toFixed(2) + "%");
         }
     }, function(error) {
-        alert(error);
+        console.log("openGallery2 FAIL", error);
     });
 
 }
 
 function startBarcode() {
-    console.log("startBarcode");
     accura.startBarcode({ enableLogs: false }, barcodeSelected, function (results) {
         generateResult(results);
     }, function (error) {
@@ -462,7 +487,6 @@ function generateResult(result) {
     var html = "";
     var sides = ["front_data", "back_data"];
     if(result.hasOwnProperty("face")) {
-        console.log("result.hasOwnProperty('face')");
         html +=
         "<div id='img-div' class='d-flex justify-content-center'>" +
         "   <img id='face' class='img-fluid' src='" + loadingImg + "' style='max-height: 120px'>" +
@@ -492,13 +516,8 @@ function generateResult(result) {
 
     sides.forEach(function (side, i) {
         if(result.hasOwnProperty(side)) {
-            console.log("result.hasOwnProperty(side)", result.hasOwnProperty(side));
-            console.log("Object.keys(result[side]).length", Object.keys(result[side]).length);
-            console.log("result.type", result.type);
             if(Object.keys(result[side]).length > 0) {
-                if(i === 0) {
-                    console.log("i is:", i);
-                    
+                if(i === 0) {                    
                     switch(result.type) {
                         case "MRZ":
                             html += "<h4 class='font-weight-bold p-2' style='background:lightgrey;'>MRZ</h4>";
@@ -533,7 +552,6 @@ function generateResult(result) {
                             "<thead></thead><tbody>";
 
                 Object.keys(result[side]).forEach(function(key) {
-                    console.log("Object.keys(result[side].forEach(function(key)))", key);
                     if(key !== "PDF417") {
                         if(["signature", "front_img", "back_img"].toString().indexOf(key) === -1) {
                             if(result[side][key] !== null && result[side][key] !== undefined && result[side][key].toString().includes("<")) {
@@ -546,7 +564,6 @@ function generateResult(result) {
                                 }
                             }
                         } else if (key === "signature") {
-                            console.log("key here is", key);
                             table += "<tr><td class='text-danger p-2'>" + key + "</td><td><img class='img-fluid' id='signature_" + side + "' src='" + loadingImg + "'></td></tr>";
                             getImage("signature_" + side, result[side][key]);
                         }
@@ -574,7 +591,6 @@ function generateResult(result) {
     if(result.hasOwnProperty('mrz_data')) {
         var keys = Object.keys(result.mrz_data);
         if(keys.length > 0) {
-            console.log("keys.length", keys.length);
             html += "<h4 class='font-weight-bold p-2' style='background:lightgrey;'>MRZ</h4>";
 
             var table = "<table id='mrz-table' class='table table-responsive'>" +
@@ -604,14 +620,12 @@ function generateResult(result) {
     }
 
     if(result.hasOwnProperty("front_img")) {
-        console.log("result.hasOwnProperty('front_img')", result.hasOwnProperty("front_img"));
         html += "<h4 class='font-weight-bold p-1' style='background:lightgrey'>Front Image</h4>" +
                 "<img class='img-fluid' id='front-image' src='" + loadingImg + "'><br>";
         getImage("front-image", result.front_img, true);
     }
 
     if(result.hasOwnProperty("back_img")) {
-        console.log("result.hasOwnProperty('back_img')", result.hasOwnProperty("back_img"));
         html += "<br><h4 class='font-weight-bold p-1' style='background:lightgrey'>Back Image</h4>" +
                 "<img class='img-fluid' id='back-image' src='" + loadingImg + "'>";
         getImage("back-image", result.back_img, true);
@@ -622,25 +636,19 @@ function generateResult(result) {
 }
 
 function getImage(id, uri, isFm = false) {
-
-    console.log("getImage(id, uri, isFm = false):- ", id, " URI:- ", uri, "isFm:- ", isFm)
     console.log("device.platform:- ", device.platform)
     if (device.platform == 'iOS') {
         segments = uri.split("/");
         fileName = segments[segments.length - 1];
-        console.log("fileName:- ", fileName)
         console.log("device.platform == 'iOS'")
 
         resolveLocalFileSystemURL(
             uri,
             dirEntry => {
-                console.log("dirEntry:- ", dirEntry);
                 //create the permanent folder
             dirEntry.file(function (file) {
-                    console.log("fileEntry.file:- ", file)
                     var reader = new FileReader();
                     reader.onloadend = function () {
-                        console.log("reader.onloadend")
                         $('#' + id).attr("src", this.result);
                         if (isFm) {
                             $('#check-ls, #check-fm').fadeIn();
@@ -648,17 +656,14 @@ function getImage(id, uri, isFm = false) {
                     };
 
                     reader.onerror = function () {
-                        console.log("reader.onerror")
                         $('#' + id).attr("src", errorImg);
                         if (isFm) {
                             $('#check-ls, #check-fm').fadeOut();
                         }
                     }
-                    console.log("reader.readAsDataURL(file)", file)
                     reader.readAsDataURL(file);
 
                 }, function () {
-                    console.log("fileEntry.file FAIL")
                     $('#' + id).attr("src", errorImg);
                     if (isFm) {
                         $('#check-ls, #check-fm').fadeOut();
@@ -666,7 +671,6 @@ function getImage(id, uri, isFm = false) {
                 });
             },
             err => {
-                console.log("window.resolveLocalFileSystemURL FAIL", error)
                 $('#' + id).attr("src", errorImg);
                 if (isFm) {
                     $('#check-ls, #check-fm').fadeOut();
@@ -678,12 +682,9 @@ function getImage(id, uri, isFm = false) {
 
         console.log("device.platform != 'iOS'")
         window.resolveLocalFileSystemURL(uri, function (fileEntry) {
-            console.log("window.resolveLocalFileSystemURL:- ", fileEntry)
             fileEntry.file(function (file) {
-                console.log("fileEntry.file:- ", file)
                 var reader = new FileReader();
                 reader.onloadend = function () {
-                    console.log("reader.onloadend")
                     $('#' + id).attr("src", this.result);
                     if (isFm) {
                         $('#check-ls, #check-fm').fadeIn();
@@ -691,24 +692,20 @@ function getImage(id, uri, isFm = false) {
                 };
 
                 reader.onerror = function () {
-                    console.log("reader.onerror")
                     $('#' + id).attr("src", errorImg);
                     if (isFm) {
                         $('#check-ls, #check-fm').fadeOut();
                     }
                 }
-                console.log("reader.readAsDataURL(file)", file)
                 reader.readAsDataURL(file);
 
             }, function () {
-                console.log("fileEntry.file FAIL")
                 $('#' + id).attr("src", errorImg);
                 if (isFm) {
                     $('#check-ls, #check-fm').fadeOut();
                 }
             });
         }, function (error) {
-            console.log("window.resolveLocalFileSystemURL FAIL", error)
             $('#' + id).attr("src", errorImg);
             if (isFm) {
                 $('#check-ls, #check-fm').fadeOut();
