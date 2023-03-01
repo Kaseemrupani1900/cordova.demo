@@ -1,14 +1,6 @@
 document.addEventListener('deviceready', onDeviceReady, false);
 
 document.addEventListener("backbutton", function () {
-    if ($('#cardModal').hasClass('show')) {
-        $('#cardModal').modal('hide');
-        return;
-    }
-    if ($('#countryModal').hasClass('show')) {
-        $('#countryModal').modal('hide');
-        return;
-    }
     if ($('#resultModal').hasClass('show')) {
         $('#resultModal').modal('hide');
         return;
@@ -86,6 +78,9 @@ var cards;
 
 var barcodeSelected = '';
 
+var barcodesTypes = [];
+var barcodesNames = [];
+
 
 function getMetadata() {
     $("#ocr-img, #fm-img").fadeOut();
@@ -98,13 +93,15 @@ function getMetadata() {
             if(results.isMRZ) {
                 for (let i = 0; i < mrzNames.length; i++) {
                     $("#tables").append(
-                        "<thead class='mrz-head' class='mrz-head'><th><button class='btn btn-round' style='width:100%;height:50px;background-color: #818589;color: white;font-size: 20px;' onclick='startMRZ(this.value)' value='" + mrzTypes[i] + "'>" + mrzNames[i] + "</button></th></tr></thead>"
+                        "<thead class='mrz-head'><th><button class='btn btn-round' style='width:100%;height:50px;background-color: #818589;color: white;font-size: 20px;' onclick='startMRZ(this.value)' value='" + mrzTypes[i] + "'>" + mrzNames[i] + "</button></th></tr></thead>"
                     )
                 }
             }
 
             if (results.isBarcode) {
                 results.barcodes.forEach(function (barcode, i) {
+                    barcodesTypes.push(barcode.type);
+                    barcodesNames.push(barcode.name);
                     if (i === 0) {
                         barcodeSelected = barcode.type;
                     }
@@ -113,13 +110,13 @@ function getMetadata() {
                     )
                 })
                 $("#tables").append(
-                    "<thead class='barcode-head' class='barcode-head'><th><button class='btn btn-round' style='width:100%;height:50px;background-color: #818589;color: white;font-size: 20px;'>Barcode</button></th></tr></thead>"
+                    "<thead class='barcode-head'><th><button class='btn btn-round' style='width:100%;height:50px;background-color: #818589;color: white;font-size: 20px;' onclick='startBarcode1()'>Barcode</button></th></tr></thead>"
                 )
             }
 
             if (results.isBankcard) {
                 $("#tables").append(
-                        "<thead class='bank-head' class='bank-head'><th><button class='btn btn-round' style='width:100%;height:50px;background-color: #818589;color: white;font-size: 20px;' onclick='startBankcard()'>Bank Card</button></th></tr></thead>"
+                        "<thead class='bank-head'><th><button class='btn btn-round' style='width:100%;height:50px;background-color: #818589;color: white;font-size: 20px;' onclick='startBankcard()'>Bank Card</button></th></tr></thead>"
                 )
             }
 
@@ -132,7 +129,7 @@ function getMetadata() {
                             countrySelected = countrySelectedForCard = uid;
                         }
                         $("#tables").append(
-                            "<thead class='ocr-head' class='ocr-head'><th><button class='btn btn-danger btn-round' style='width:100%;height:50px;color: white;font-size: 20px;' onclick='getCardModal(this.id)' id='" + i + "'>" + country.name + "</button></th></tr></thead>"
+                            "<thead class='ocr-head'><th><button class='btn btn-danger btn-round' style='width:100%;height:50px;color: white;font-size: 20px;' onclick='getCardModal(this.id)' id='" + i + "'>" + country.name + "</button></th></tr></thead>"
                         )
                     })
                 }
@@ -177,7 +174,7 @@ function getCardModal(id) {
 
     countryCard.forEach(function(card, i) {
         $("#tables").append(
-            "<thead class='ocr-card-head' class='ocr-card-head'><th><button class='btn btn-danger btn-round' style='width:100%;height:50px;color: white;font-size: 20px;' onClick='openForCard(this.id)' id='" + i + "'>" + card.name + "</button></th></tr></thead>"
+            "<thead class='ocr-card-head'><th><button class='btn btn-danger btn-round' style='width:100%;height:50px;color: white;font-size: 20px;' onClick='openForCard(this.id)' id='" + i + "'>" + card.name + "</button></th></tr></thead>"
         )
     });
 }
@@ -210,6 +207,12 @@ function backAction() {
         $("#fm-div").fadeOut();
         $("#ocr-img, #fm-img").fadeIn();
         $("#back-btn").fadeOut();
+    }
+
+    if ($(".barcode-types").is(":visible")) {
+        $(".barcode-types").empty();
+        $(".barcode-types").fadeOut();
+        $(".mrz-head, .barcode-head, .bank-head, .ocr-head").fadeIn();
     }
 
 }
@@ -462,8 +465,19 @@ function openGallery2() {
 
 }
 
-function startBarcode() {
-    accura.startBarcode({ enableLogs: false }, barcodeSelected, function (results) {
+function startBarcode1() {
+    $(".mrz-head, .barcode-head, .bank-head, .ocr-head").fadeOut();
+
+    for (let i = 0; i < barcodesNames.length; i++) {
+        $("#tables").append(
+            "<thead class='barcode-types'><th><button class='btn btn-round' style='width:100%;height:50px;background-color: #818589;color: white;font-size: 20px;' onclick='startBarcode(this.value)' value='" + barcodesTypes[i] + "'>" + barcodesNames[i] + "</button></th></tr></thead>"
+        )
+    }
+
+}
+
+function startBarcode(id) {
+    accura.startBarcode({ enableLogs: false }, id, function (results) {
         generateResult(results);
     }, function (error) {
         alert(error);

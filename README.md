@@ -159,40 +159,25 @@ function onDeviceReady() {
 ### Setting up License
 ```
 function getMetadata() {
-    console.log("heloooooooooo");
-    $('#countries-1, #countryModal .modal-body').empty();
+    $("#ocr-img, #fm-img").fadeOut();
+    $("#back-btn").fadeIn();
     accura.getMetadata(function(results) {
-        console.log("getMetadata PASS", results);
         if(results.isValid) {
-            alert("License Loaded " + results.sdkVersion);
+//            alert("License Loaded " + results.sdkVersion);
             $("#main-div").fadeIn();
-            if(results.isOCR) {
-                $("#ocr-div").fadeIn();
-                if(results.countries.length > 0) {
-                    countries = results.countries;
-                    results.countries.forEach(function (country, i) {
-                        var uid = i + "_" + country.id;
-                        if(i === 0) {
-                            countrySelected = countrySelectedForCard = uid;
-                            getCards(countrySelectedForCard);
-                        }
-                        $('#countries-1').append(
-                            '<option value="' + uid + '">' + country.name + '</option>'
-                        )
-                        $("#countryModal .modal-body").append(
-                            "<h5 onclick='getCardModal(this.id)' class='country-card' id='" + i + "'>" + country.name + "</h5>"
-                        )
-                    })
+
+            if(results.isMRZ) {
+                for (let i = 0; i < mrzNames.length; i++) {
+                    $("#tables").append(
+                        "<thead class='mrz-head'><th><button class='btn btn-round' style='width:100%;height:50px;background-color: #818589;color: white;font-size: 20px;' onclick='startMRZ(this.value)' value='" + mrzTypes[i] + "'>" + mrzNames[i] + "</button></th></tr></thead>"
+                    )
                 }
             }
-            
-            if(results.isMRZ) {
-                $("#mrz-div").fadeIn();
-            }
-            
+
             if (results.isBarcode) {
-                $("#barcode-div").fadeIn();
                 results.barcodes.forEach(function (barcode, i) {
+                    barcodesTypes.push(barcode.type);
+                    barcodesNames.push(barcode.name);
                     if (i === 0) {
                         barcodeSelected = barcode.type;
                     }
@@ -200,12 +185,32 @@ function getMetadata() {
                         '<option value="' + barcode.type + '">' + barcode.name + '</option>'
                     )
                 })
+                $("#tables").append(
+                    "<thead class='barcode-head'><th><button class='btn btn-round' style='width:100%;height:50px;background-color: #818589;color: white;font-size: 20px;' onclick='startBarcode1()'>Barcode</button></th></tr></thead>"
+                )
             }
-            
+
             if (results.isBankcard) {
-                $("#bank-div").fadeIn();
+                $("#tables").append(
+                        "<thead class='bank-head'><th><button class='btn btn-round' style='width:100%;height:50px;background-color: #818589;color: white;font-size: 20px;' onclick='startBankcard()'>Bank Card</button></th></tr></thead>"
+                )
             }
-            
+
+            if(results.isOCR) {
+                if(results.countries.length > 0) {
+                    countries = results.countries;
+                    results.countries.forEach(function (country, i) {
+                        var uid = i + "_" + country.id;
+                        if(i === 0) {
+                            countrySelected = countrySelectedForCard = uid;
+                        }
+                        $("#tables").append(
+                            "<thead class='ocr-head'><th><button class='btn btn-danger btn-round' style='width:100%;height:50px;color: white;font-size: 20px;' onclick='getCardModal(this.id)' id='" + i + "'>" + country.name + "</button></th></tr></thead>"
+                        )
+                    })
+                }
+            }
+
         } else {
             alert("License Not Loaded");
         }
@@ -348,9 +353,8 @@ function setupAccuraConfig() {
 
 # 4.Method For Scan MRZ Documents.
 ```
-function startMRZ() {
-    accura.startMRZ({enableLogs: false}, mrzSelected, mrzCountryList, function(result) {
-        console.log("startMRZ PASS", result);
+function startMRZ(value) {
+    accura.startMRZ({enableLogs: false}, value, mrzCountryList, function(result) {
         generateResult(result);
     }, function(error) {
         console.log("startMRZ FAIL", error)
@@ -389,13 +393,8 @@ Error: String
 # 5.Method For Scan OCR Documents.
 ```
 function openForCard(id) {
-    $("#countryModal").modal('hide');
-    $("#cardModal").modal('hide');
-
-    console.log("countryCard[id].type ", countryCard[id].type);
 
     accura.startOCR({enableLogs: false}, countrySelectedId, countryCard[id].id, countryCard[id].name, countryCard[id].type, function(result) {
-        console.log(result);
         generateResult(result);
     }, function(error) {
         console.log(error);
@@ -425,8 +424,8 @@ Error: String
 
 # 6.Method For Scan Barcode.
 ```
-function startBarcode() {
-    accura.startBarcode({ enableLogs: false }, barcodeSelected, function (results) {
+function startBarcode(id) {
+    accura.startBarcode({ enableLogs: false }, id, function (results) {
         generateResult(results);
     }, function (error) {
         alert(error);
