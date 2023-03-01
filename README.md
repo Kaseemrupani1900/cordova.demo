@@ -150,7 +150,7 @@ function onDeviceReady() {
 
      // Cordova is now initialized.
 
-     accura = cordova.plugins.KaseemTrialPlugin;
+     accura = cordova.plugins.CordovaDemoPlugin;
 
 }
 ```
