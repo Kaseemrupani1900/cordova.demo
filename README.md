@@ -10,7 +10,7 @@ Below steps to setup Accura Scan's SDK to your project.
 
 # Add Android Or iOS Platform
 ```
-$ cordova platform add android@9.1.0
+$ cordova platform add android
 $ cordova platform add ios
 ```
 
