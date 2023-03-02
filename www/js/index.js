@@ -45,7 +45,7 @@ function onDeviceReady() {
     }
 
     console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
-    accura = cordova.plugins.CordovaPluginKYC;
+    accura = cordova.plugins.CordovaDemoPlugin;
 
     accura.getMetadata(function(results) {
 

@@ -14,6 +14,17 @@ $ cordova platform add android
 $ cordova platform add ios
 ```
 
+# Add Cordova KYC Plugin
+```
+$ cordova plugin add cordova_demo
+```
+
+# Add Dependencies
+
+```
+$ cordova plugin add cordova-plugin-file
+```
+
 # 1.Setup Android
 
 Step 1: Add it in your root build.gradle at the end of repositories.
@@ -66,25 +77,6 @@ android {
 	
 }
 ```
-
-
-# Add Cordova KYC Plugin
-```
-$ cordova plugin add cordova_demo
-```
-# Add Dependencies
-
-```
-$ cordova plugin add cordova-plugin-file
-
-$ cordova plugin add cordova-plugin-whitelist
-
-$ cordova plugin add cordova-plugin-add-swift-support
-```
-
-# Run Cordova Build Command
-
-`$ cordova build`
 
 # 2.Setup AccuraScan Licenses Into Your Projects
 
