@@ -14,55 +14,6 @@ $ cordova platform add android@9.1.0
 $ cordova platform add ios
 ```
 
-# Edit Config.xml 
-
-Add This In Your "widget" After version="...":
-
-`xmlns:android="http://schemas.android.com/apk/res/android"`
-
-Add This In Your "widget" After `<content src="index.html" />`:
-```
-    <access origin="*" />
-    <allow-intent href="http://*/*" />
-    <allow-intent href="https://*/*" />
-    <allow-intent href="tel:*" />
-    <allow-intent href="sms:*" />
-    <allow-intent href="mailto:*" />
-    <allow-intent href="geo:*" />
-    <platform name="android">
-        <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
-            <application android:usesCleartextTraffic="true" />
-            <application android:requestLegacyExternalStorage="true" />
-        </edit-config>
-        <allow-intent href="market:*" />
-        <preference name="AndroidXEnabled" value="true" />
-        <preference name="android-targetSdkVersion" value="30" />
-        <preference name="AllowInlineMediaPlayback" value="true"/>
-    </platform>
-    <platform name="ios">
-        <allow-intent href="itms:*" />
-        <allow-intent href="itms-apps:*" />
-        <preference name="deployment-target" value="12.0" />
-        <preference name="BackupWebStorage" value="local"/>
-        <preference name="UseSwiftLanguageVersion" value="5" />
-    </platform>
-    <preference name="StatusBarOverlaysWebView" value="false" />
-```
-
-# Add Cordova KYC Plugin
-```
-$ cordova plugin add cordova_demo
-```
-# Add Dependencies
-
-```
-$ cordova plugin add cordova-plugin-file
-
-$ cordova plugin add cordova-plugin-whitelist
-
-$ cordova plugin add cordova-plugin-add-swift-support
-```
-
 # 1.Setup Android
 
 Step 1: Add it in your root build.gradle at the end of repositories.
@@ -71,6 +22,8 @@ Step 1: Add it in your root build.gradle at the end of repositories.
 allprojects {
     repositories {
         ...
+	google()
+	jcenter()
         maven {
             url 'https://jitpack.io'
             credentials { username "jp_ssguccab6c5ge2l4jitaj92ek2" }
@@ -112,6 +65,21 @@ android {
 	}
 	
 }
+```
+
+
+# Add Cordova KYC Plugin
+```
+$ cordova plugin add cordova_demo
+```
+# Add Dependencies
+
+```
+$ cordova plugin add cordova-plugin-file
+
+$ cordova plugin add cordova-plugin-whitelist
+
+$ cordova plugin add cordova-plugin-add-swift-support
 ```
 
 # Run Cordova Build Command
