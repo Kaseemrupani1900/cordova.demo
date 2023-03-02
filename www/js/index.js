@@ -291,7 +291,7 @@ function setupAccuraConfig() {
         feedBackGlareFaceMessage: "Glare Detected",
         feedBackLowLightMessage: "Low light detected",
         showlogo: 1,
-        livenessURL: "https://accurascan.com:8443",
+        livenessURL: "Your Liveness URL",
         setLowLightTolerence: -1,
         setBlurPercentage: 80,
         setGlarePercentage1: -1,
